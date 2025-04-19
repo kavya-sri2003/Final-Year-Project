@@ -1,0 +1,98 @@
+#include "DFRobot_DF2301Q.h"
+#include <LiquidCrystal.h>
+const int rs = 5, en = 18, d4 = 19, d5 = 25, d6 = 26, d7 = 23;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+const int LIGHT = 2;
+const int FAN = 15;
+const int MOTOR = 13;
+//I2C communication
+DFRobot_DF2301Q_I2C asr;
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(LIGHT, OUTPUT);    //Init LED pin to output mode
+  digitalWrite(LIGHT, LOW);  //Set LED pin to low 
+
+  pinMode(FAN, OUTPUT);    //Init LED pin to output mode
+  digitalWrite(FAN, LOW);  //Set LED pin to low 
+
+  pinMode(MOTOR, OUTPUT);    //Init LED pin to output mode
+  digitalWrite(MOTOR, LOW);  //Set LED pin to low 
+
+ 
+  while (!(asr.begin())) {
+    Serial.println("Communication with device failed, please check connection");
+    delay(3000);
+  }
+  Serial.println("Begin ok!");
+
+
+  asr.setVolume(4);
+
+ 
+  asr.setMuteMode(0);
+
+
+  asr.setWakeTime(20);
+
+
+  uint8_t wakeTime = 0;
+  wakeTime = asr.getWakeTime();
+  Serial.print("wakeTime = ");
+  Serial.println(wakeTime);
+
+ 
+ 
+}
+
+void loop() {
+ 
+  uint8_t CMDID = asr.getCMDID();
+  switch (CMDID) {
+    case 103:                                                  //If the command is “Turn on the light”
+      digitalWrite(LIGHT, HIGH);                                 //Turn on the LED
+      Serial.println("received'Turn on the light',command flag'103'");  //Serial transmits "received"Turn on the light",command flag"103
+      break;
+
+    case 104:                                                  //If the command is “Turn off the light”
+      digitalWrite(LIGHT, LOW);                                  //Turn off the LED
+      Serial.println("received'Turn off the light',command flag'104'");  //The serial transmits "received"Turn off the light",command flag"104""
+      break;
+
+
+
+     case 75:                                                  //If the command is “Turn on the light”
+      digitalWrite(FAN, HIGH);                                 //Turn on the LED
+      Serial.println("received'Turn on the FAN',command flag'75'");  //Serial transmits "received"Turn on the light",command flag"103
+      break;
+
+    case 76:                                                  //If the command is “Turn off the light”
+      digitalWrite(FAN, LOW);                                  //Turn off the LED
+      Serial.println("received'Turn off the FAN',command flag'76'");  //The serial transmits "received"Turn off the light",command flag"104""
+      break;
+      
+
+
+      case 5:                                                  //If the command is “Turn on the light”
+      digitalWrite(MOTOR, HIGH);                                 //Turn on the LED
+      Serial.println("received'Turn on the MOTOR',command flag'5'");  //Serial transmits "received"Turn on the light",command flag"103
+      break;
+
+    case 6:                                                  //If the command is “Turn off the light”
+      digitalWrite(MOTOR, LOW);                                  //Turn off the LED
+      Serial.println("received'Turn off the MOTOR',command flag'6'");  //The serial transmits "received"Turn off the light",command flag"104""
+      break;
+
+
+    default:
+      if (CMDID != 0) {
+        Serial.print("CMDID = ");  //Printing command ID
+        Serial.println(CMDID);
+      }
+        Serial.print("CMDID = ");  //Printing command ID
+        Serial.println(CMDID);
+  }
+  delay(300);
+}
